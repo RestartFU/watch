@@ -84,7 +84,7 @@ func (c *Checker) extractDecl(dep *deployement) {
 	tok := c.Expect(String)
 	split := strings.Split(tok.text, " ")
 	if len(split) != 2 {
-		c.Fatalf(c.tokenizer.pos, "expected two arguments but got %d", len(split))
+		c.Fatalf(c.tokenizer.pos, " expected two arguments but got %d", len(split))
 	}
 	dep.extracts = append(dep.extracts, extractment{
 		name: split[0],

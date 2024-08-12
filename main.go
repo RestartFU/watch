@@ -5,8 +5,10 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 type deployement struct {
@@ -38,10 +40,14 @@ func main() {
 	rciFilePath := wd + "/Coolfile"
 	dep := parse(rciFilePath)
 	dep.wd = wd
-	deploy(dep)
+
+	ch := make(chan os.Signal, 2)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+
+	deploy(dep, ch)
 }
 
-func deploy(d deployement) {
+func deploy(d deployement, ch chan os.Signal) {
 	d.url = "https://" + d.url
 	dir := strconv.Itoa(rand.Intn(10000000))
 	output := "/tmp/" + dir
@@ -66,8 +72,12 @@ func deploy(d deployement) {
 	for _, e := range d.extracts {
 		e.extract(output, d.wd)
 	}
+	go func() {
+		<-ch
+		sh(d.end)
+	}()
+
 	sh(d.then)
-	sh(d.end)
 }
 
 func sh(args string) {
