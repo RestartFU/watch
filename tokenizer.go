@@ -140,11 +140,10 @@ func (t *tokenizer) Token() (token token, err error) {
 		}
 		for _, v := range []tokenKind{
 			Clone,
-			Begin,
+			Run,
 			Extract,
-			Then,
 			End,
-			With,
+			As,
 		} {
 			if t.data[token.offset:t.offset] == v.identifier {
 				token.kind = v
@@ -159,11 +158,24 @@ func (t *tokenizer) Token() (token token, err error) {
 			}
 			t.Next()
 		}
-	case currRune == ':':
+	case currRune == '(':
 		token.kind = String
 		for t.offset < len(t.data) {
 			switch {
-			case t.r == '\n':
+			case t.r == ')':
+				t.Next()
+				break
+			default:
+				t.Next()
+				continue
+			}
+			break
+		}
+	case currRune == '$', t.Next() == '[':
+		token.kind = Variable
+		for t.offset < len(t.data) {
+			switch {
+			case t.r == ']':
 				t.Next()
 				break
 			default:
@@ -177,8 +189,10 @@ func (t *tokenizer) Token() (token token, err error) {
 	}
 	text := t.data[token.offset:t.offset]
 	switch token.kind {
+	case Variable:
+		text = text[2 : len(text)-1]
 	case String:
-		text = text[2:]
+		text = text[1 : len(text)-1]
 	case EOF, Semicolon:
 		t.insertSemicolon = false
 	case Identifier:
@@ -197,14 +211,21 @@ var (
 
 	Identifier = tokenKind{"identifier"}
 	String     = tokenKind{"string"}
+	Variable   = tokenKind{"variable"}
 
 	// Keywords
 	Clone   = tokenKind{"CLONE"}
-	Begin   = tokenKind{"BEGIN"}
+	Run     = tokenKind{"RUN"}
+	In      = tokenKind{"IN"}
 	Extract = tokenKind{"EXTRACT"}
-	Then    = tokenKind{"THEN"}
 	End     = tokenKind{"END"}
-	With    = tokenKind{"WITH"}
+	As      = tokenKind{"AS"}
+
+	SqrBracketLeft  = tokenKind{"["}
+	SqrBracketRight = tokenKind{"["}
+
+	BracketLeft  = tokenKind{"("}
+	BracketRight = tokenKind{")"}
 
 	// Separators
 	Semicolon = tokenKind{";"}

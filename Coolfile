@@ -1,6 +1,0 @@
-CLONE: github.com/moyai-network/teams@master
-
-BEGIN: go build -o bin .
-EXTRACT: bin ./../teams/
-THEN: cd ~/projects/teams/ && ./bin
-END: rm -rf bin

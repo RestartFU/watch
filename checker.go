@@ -3,16 +3,24 @@ package main
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 )
+
+type repository struct {
+	path string
+	url  string
+}
 
 type Checker struct {
 	tokenizer *tokenizer
 	prevToken token
 	currToken token
 
-	filename string
+	variables map[string]string
+	filename  string
 }
 
 func (c *Checker) Fatalf(pos pos, format string, args ...any) {
@@ -58,38 +66,51 @@ func (c *Checker) Current() tokenKind {
 func (c *Checker) deployDecl(dep *deployement) {
 	c.Next()
 	tok := c.Expect(String)
-	dep.url = tok.text
+
+	dep.repository.url = "https://" + tok.text
+	dir := strconv.Itoa(rand.Intn(10000000))
+	dep.repository.path = "/tmp/" + dir
+
+	fmt.Println(dep.repository)
+	if c.Allow(As) {
+		str := c.Expect(String)
+		c.variables[str.text] = dep.repository.path
+		fmt.Println(c.variables)
+	}
 }
 
-func (c *Checker) beginDecl(dep *deployement) {
+func (c *Checker) runDecl(dep *deployement) {
 	c.Next()
 	tok := c.Expect(String)
-	dep.begin = tok.text
-}
+	str := tok.text
+	for k, v := range c.variables {
+		str = strings.ReplaceAll(str, fmt.Sprintf("$[%s]", k), v)
+	}
 
-func (c *Checker) thenDecl(dep *deployement) {
-	c.Next()
-	tok := c.Expect(String)
-	dep.then = tok.text
-}
-
-func (c *Checker) endDecl(dep *deployement) {
-	c.Next()
-	tok := c.Expect(String)
-	dep.end = tok.text
+	dep.commands = append(dep.commands, str)
+	fmt.Println(dep.commands)
 }
 
 func (c *Checker) extractDecl(dep *deployement) {
 	c.Next()
 	tok := c.Expect(String)
-	split := strings.Split(tok.text, " ")
+	str := tok.text
+	for k, v := range c.variables {
+		str = strings.ReplaceAll(str, fmt.Sprintf("$[%s]", k), v)
+	}
+
+	split := strings.Split(str, " ")
 	if len(split) != 2 {
 		c.Fatalf(c.tokenizer.pos, " expected two arguments but got %d", len(split))
 	}
-	dep.extracts = append(dep.extracts, extractment{
-		name: split[0],
-		out:  split[1],
-	})
+
+	out := split[1]
+	if strings.HasPrefix(out, ".") {
+		out = wd + out[1:]
+	}
+
+	cmd := fmt.Sprintf("mv %s %s", split[0], out)
+	dep.commands = append(dep.commands, cmd)
 }
 
 func parse(filename string) deployement {
@@ -100,6 +121,7 @@ func parse(filename string) deployement {
 	}
 	c := &Checker{
 		tokenizer: newTokenizer(string(buf)),
+		variables: map[string]string{},
 		filename:  filename,
 	}
 	c.Next()
@@ -108,15 +130,12 @@ decls:
 		switch curr := c.Current(); curr {
 		case Clone:
 			c.deployDecl(dep)
-		case Begin:
-			c.beginDecl(dep)
+		case Run:
+			c.runDecl(dep)
 		case Extract:
 			c.extractDecl(dep)
-		case Then:
-			c.thenDecl(dep)
-		case End:
-			c.endDecl(dep)
 		default:
+			fmt.Println()
 			break decls
 		}
 	}
