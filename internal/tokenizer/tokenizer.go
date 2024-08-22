@@ -1,4 +1,4 @@
-package main
+package tokenizer
 
 import (
 	"errors"
@@ -11,24 +11,8 @@ const (
 	RuneError = 65533
 )
 
-type pos struct {
-	offset int
-	line   int
-	column int
-}
-
-type tokenKind struct {
-	identifier string
-}
-
-type token struct {
-	pos
-	kind tokenKind
-	text string
-}
-
-type tokenizer struct {
-	pos
+type Tokenizer struct {
+	Position
 	data              string
 	r                 rune
 	w                 int
@@ -36,10 +20,10 @@ type tokenizer struct {
 	insertSemicolon   bool
 }
 
-func newTokenizer(data string) *tokenizer {
-	t := &tokenizer{
-		pos:  pos{line: 1},
-		data: data,
+func NewTokenizer(data string) *Tokenizer {
+	t := &Tokenizer{
+		Position: Position{line: 1},
+		data:     data,
 	}
 	t.Next()
 	if t.r == RuneBom {
@@ -48,7 +32,7 @@ func newTokenizer(data string) *tokenizer {
 	return t
 }
 
-func (t *tokenizer) Next() rune {
+func (t *Tokenizer) Next() rune {
 	if t.offset >= len(t.data) {
 		return RuneEof
 	} else {
@@ -62,7 +46,7 @@ func (t *tokenizer) Next() rune {
 	return t.r
 }
 
-func (t *tokenizer) skipWhiteSpace(newLine bool) {
+func (t *Tokenizer) skipWhiteSpace(newLine bool) {
 loop:
 	for t.offset < len(t.data) {
 		switch t.r {
@@ -103,10 +87,10 @@ func isAny(r rune, runes ...rune) bool {
 	return false
 }
 
-func (t *tokenizer) Token() (token token, err error) {
+func (t *Tokenizer) Token() (token Token, err error) {
 	t.skipWhiteSpace(t.insertSemicolon)
 
-	token.pos = t.pos
+	token.Position = t.Position
 	token.kind = Invalid
 
 	var currRune rune = t.r
@@ -138,7 +122,7 @@ func (t *tokenizer) Token() (token token, err error) {
 			}
 			break
 		}
-		for _, v := range []tokenKind{
+		for _, v := range []TokenKind{
 			Clone,
 			Run,
 			Extract,
@@ -203,30 +187,3 @@ func (t *tokenizer) Token() (token token, err error) {
 	token.text = text
 	return
 }
-
-var (
-	Invalid = tokenKind{"invalid"}
-	EOF     = tokenKind{"EOF"}
-	Comment = tokenKind{"comment"}
-
-	Identifier = tokenKind{"identifier"}
-	String     = tokenKind{"string"}
-	Variable   = tokenKind{"variable"}
-
-	// Keywords
-	Clone   = tokenKind{"CLONE"}
-	Run     = tokenKind{"RUN"}
-	In      = tokenKind{"IN"}
-	Extract = tokenKind{"EXTRACT"}
-	End     = tokenKind{"END"}
-	As      = tokenKind{"AS"}
-
-	SqrBracketLeft  = tokenKind{"["}
-	SqrBracketRight = tokenKind{"["}
-
-	BracketLeft  = tokenKind{"("}
-	BracketRight = tokenKind{")"}
-
-	// Separators
-	Semicolon = tokenKind{";"}
-)
