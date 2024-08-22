@@ -1,0 +1,8 @@
+CLONE (github.com/fhinkel/nodejs-hello-world@main) AS (STABLE)
+SET (MAIN_SCRIPT=index.js)
+SET (INSTALL_DIR=./../../bin/nodejs)
+
+RUN (mkdir -p $[INSTALL_DIR])
+RUN (cd $[STABLE] && npm install --prefix $[INSTALL_DIR])
+EXTRACT ($[STABLE]/* $[INSTALL_DIR])
+RUN (sudo node $[INSTALL_DIR]/$[MAIN_SCRIPT])

@@ -7,6 +7,9 @@ view_page:
 test_go:
 	sudo ./scripts/build.sh
 	cd examples/go && watch
+test_nodejs:
+	sudo ./scripts/build.sh
+	cd examples/nodejs && watch
 test:
 	rm -rf bin/*
 	python scripts/test_all.py
