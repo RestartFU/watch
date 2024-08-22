@@ -104,7 +104,7 @@ func (c *Checker) extractDecl(dep *Result) {
 		out = wd + out[1:]
 	}
 
-	cmd := fmt.Sprintf("mv %s %s", split[0], out)
+	cmd := fmt.Sprintf("mv %s %s ", split[0], out)
 	dep.Commands = append(dep.Commands, cmd)
 }
 
