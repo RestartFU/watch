@@ -9,3 +9,5 @@ view_page:
 test_go:
 	sudo ./scripts/build.sh
 	cd examples/go && watch
+test:
+	python scripts/test_all.py

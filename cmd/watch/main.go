@@ -31,6 +31,7 @@ func deploy(d parser.Result) {
 	}
 	sh(strings.Join(cloning, " && "))
 
+	fmt.Println()
 	for _, c := range d.Commands {
 		sh(c)
 	}

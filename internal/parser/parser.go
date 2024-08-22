@@ -71,7 +71,6 @@ func (c *Checker) cloneDecl(dep *Result) {
 	if c.Allow(tokenizer.As) {
 		str := c.Expect(tokenizer.String)
 		c.variables[str.Text()] = dep.RepositoryTemporaryPath
-		fmt.Println(c.variables)
 	}
 }
 
@@ -84,7 +83,6 @@ func (c *Checker) runDecl(dep *Result) {
 	}
 
 	dep.Commands = append(dep.Commands, str)
-	fmt.Println(dep.Commands)
 }
 
 func (c *Checker) extractDecl(dep *Result) {
