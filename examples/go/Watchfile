@@ -1,5 +1,5 @@
 CLONE (github.com/go-training/helloworld@master) AS (STABLE)
-SET (BINARY_NAME=sample_binary)
+SET (BINARY_NAME=sample_go)
 SET (BINARY_PATH=./../../bin/$[BINARY_NAME])
 
 RUN (cd $[STABLE] && go build -o $[BINARY_NAME] main.go)

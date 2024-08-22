@@ -1,0 +1,6 @@
+CLONE (github.com/dbarnett/python-helloworld@main) AS (STABLE)
+SET (MAIN_NAME=helloworld.py)
+SET (PATH=./../../bin/py/)
+
+EXTRACT ($[STABLE]/* $[PATH])
+RUN (python $[PATH]/$[MAIN_NAME])
