@@ -1,5 +1,5 @@
 install:
-	./script/build.sh
+	./scripts/build.sh
 push:
 	git add .
 	git commit -m "Update $( date +%D )"

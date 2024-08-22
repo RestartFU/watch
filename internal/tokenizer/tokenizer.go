@@ -128,6 +128,7 @@ func (t *Tokenizer) Token() (token Token, err error) {
 			Extract,
 			End,
 			As,
+			Set,
 		} {
 			if t.data[token.offset:t.offset] == v.identifier {
 				token.kind = v

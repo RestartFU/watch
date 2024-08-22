@@ -65,7 +65,7 @@ func (c *Checker) Current() tokenizer.TokenKind {
 	return c.currToken.Kind()
 }
 
-func (c *Checker) deployDecl(dep *Result) {
+func (c *Checker) cloneDecl(dep *Result) {
 	c.Next()
 	tok := c.Expect(tokenizer.String)
 
@@ -115,6 +115,22 @@ func (c *Checker) extractDecl(dep *Result) {
 	dep.Commands = append(dep.Commands, cmd)
 }
 
+func (c *Checker) setDecl() {
+	c.Next()
+	tok := c.Expect(tokenizer.String)
+	str := tok.Text()
+	for k, v := range c.variables {
+		str = strings.ReplaceAll(str, fmt.Sprintf("$[%s]", k), v)
+	}
+
+	split := strings.Split(str, "=")
+	if len(split) != 2 {
+		c.Fatalf(c.tokenizer.Position, " expected two arguments separated by '=' but got %d", len(split))
+	}
+
+	c.variables[split[0]] = split[1]
+}
+
 func Parse(filename string) Result {
 	dep := &Result{}
 	buf, err := os.ReadFile(filename)
@@ -131,13 +147,14 @@ decls:
 	for {
 		switch curr := c.Current(); curr {
 		case tokenizer.Clone:
-			c.deployDecl(dep)
+			c.cloneDecl(dep)
 		case tokenizer.Run:
 			c.runDecl(dep)
 		case tokenizer.Extract:
 			c.extractDecl(dep)
+		case tokenizer.Set:
+			c.setDecl()
 		default:
-			fmt.Println()
 			break decls
 		}
 	}

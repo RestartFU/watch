@@ -34,6 +34,7 @@ var (
 	Extract = TokenKind{"EXTRACT"}
 	End     = TokenKind{"END"}
 	As      = TokenKind{"AS"}
+	Set     = TokenKind{"SET"}
 
 	SqrBracketLeft  = TokenKind{"["}
 	SqrBracketRight = TokenKind{"["}

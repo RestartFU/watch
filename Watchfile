@@ -1,5 +1,0 @@
-CLONE(github.com/moyai-network/teams@master) AS(stable)
-
-RUN(cd $[stable] && go build -o bin .)
-EXTRACT($[stable]/bin ./bin)
-RUN(./bin/bin)

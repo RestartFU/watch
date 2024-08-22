@@ -1,7 +1,7 @@
 package main
 
-import cmd "github.com/restartfu/watch/cmd/api"
+import "github.com/restartfu/watch/cmd/watch"
 
 func main() {
-	cmd.Execute()
+	watch.Execute()
 }
