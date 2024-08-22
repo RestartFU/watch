@@ -1,10 +1,7 @@
 install:
 	sudo ./scripts/build.sh
 push:
-	python scripts/format_examples.py
-	git add .
-	git commit -m "Update $( date +%D )"
-	git push
+	./scripts/push.sh
 view_page:
 	librewolf https://github.com/restartfu/watch
 test_go:
