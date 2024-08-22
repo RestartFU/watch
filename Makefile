@@ -1,6 +1,7 @@
 install:
 	sudo ./scripts/build.sh
 push:
+	python scripts/format_examples.py
 	git add .
 	git commit -m "Update $( date +%D )"
 	git push
@@ -9,5 +10,5 @@ view_page:
 test_go:
 	sudo ./scripts/build.sh
 	cd examples/go && watch
-test:
+test_all:
 	python scripts/test_all.py
