@@ -1,7 +1,7 @@
-CLONE(github.com/go-training/helloworld@master) AS(STABLE)
-SET(BINARY_NAME=sample_binary)
-SET(BINARY_PATH=./../../bin/$[BINARY_NAME])
+CLONE (github.com/go-training/helloworld@master) AS (STABLE)
+SET (BINARY_NAME=sample_binary)
+SET (BINARY_PATH=./../../bin/$[BINARY_NAME])
 
-RUN(cd $[STABLE] && go build -o $[BINARY_NAME] main.go)
-EXTRACT($[STABLE]/$[BINARY_NAME] $[BINARY_PATH])
-RUN($[BINARY_PATH])
+RUN (cd $[STABLE] && go build -o $[BINARY_NAME] main.go)
+EXTRACT ($[STABLE]/$[BINARY_NAME] $[BINARY_PATH])
+RUN ($[BINARY_PATH])
