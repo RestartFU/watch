@@ -1,3 +1,3 @@
-go build -o ci .
-chmod +x ci
-mv ci /usr/bin/ci
+go build -o watch .
+chmod +x watch
+mv ci /usr/bin/watch
