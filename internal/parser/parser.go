@@ -11,11 +11,6 @@ import (
 	"github.com/restartfu/watch/internal/tokenizer"
 )
 
-type repository struct {
-	path string
-	url  string
-}
-
 type Checker struct {
 	tokenizer *tokenizer.Tokenizer
 	prevToken tokenizer.Token
