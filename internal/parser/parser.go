@@ -71,7 +71,7 @@ func (c *Checker) cloneDecl(dep *Result) {
 
 	dep.RepositoryURL = "https://" + tok.Text()
 	dir := strconv.Itoa(rand.Intn(10000000))
-	dep.RepositoryTemporaryPath = "/tmp/" + dir
+	dep.RepositoryTemporaryPath = "/tmp/watch-" + dir
 
 	if c.Allow(tokenizer.As) {
 		str := c.Expect(tokenizer.String)
