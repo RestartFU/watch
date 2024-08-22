@@ -64,14 +64,26 @@ func (c *Checker) cloneDecl(dep *Result) {
 	c.Next()
 	tok := c.Expect(tokenizer.String)
 
-	dep.RepositoryURL = "https://" + tok.Text()
-	dir := strconv.Itoa(rand.Intn(10000000))
-	dep.RepositoryTemporaryPath = "/tmp/watch-" + dir
+	url := "https://" + tok.Text()
+	tmp := "/tmp/watch-" + strconv.Itoa(rand.Intn(10000000))
+
+	clone := fmt.Sprintf("git clone --depth=1 %s %s", url, tmp)
+
+	split := strings.Split(url, "@")
+	if len(split) == 2 {
+		clone = fmt.Sprintf("git clone --depth=1 %s %s --branch %s", split[0], tmp, split[1])
+	}
+	cloning := []string{
+		"cd /tmp",
+		clone,
+	}
 
 	if c.Allow(tokenizer.As) {
 		str := c.Expect(tokenizer.String)
-		c.variables[str.Text()] = dep.RepositoryTemporaryPath
+		c.variables[str.Text()] = tmp
 	}
+
+	dep.Commands = append(dep.Commands, strings.Join(cloning, " && "))
 }
 
 func (c *Checker) runDecl(dep *Result) {
@@ -124,7 +136,7 @@ func (c *Checker) setDecl() {
 	c.variables[split[0]] = split[1]
 }
 
-func Parse(filename string) Result {
+func Parse(filename string) []string {
 	dep := &Result{}
 	buf, err := os.ReadFile(filename)
 	if err != nil {
@@ -154,12 +166,9 @@ decls:
 	c.Allow(tokenizer.Semicolon)
 	c.Expect(tokenizer.EOF)
 
-	return *dep
+	return dep.Commands
 }
 
 type Result struct {
-	RepositoryURL,
-	RepositoryTemporaryPath string
-
 	Commands []string
 }

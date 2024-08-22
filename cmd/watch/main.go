@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/restartfu/watch/internal/parser"
 )
@@ -12,27 +11,14 @@ import (
 func Execute() {
 	wd, _ := os.Getwd()
 	rciFilePath := wd + "/Watchfile"
-	dep := parser.Parse(rciFilePath)
 
-	deploy(dep)
+	cmds := parser.Parse(rciFilePath)
+	deploy(cmds)
 }
 
-func deploy(d parser.Result) {
-	clone := fmt.Sprintf("git clone --depth=1 %s %s", d.RepositoryURL, d.RepositoryTemporaryPath)
-
-	split := strings.Split(d.RepositoryURL, "@")
-	if len(split) == 2 {
-		clone = fmt.Sprintf("git clone --depth=1 %s %s --branch %s", split[0], d.RepositoryTemporaryPath, split[1])
-	}
-
-	cloning := []string{
-		"cd /tmp",
-		clone,
-	}
-	sh(strings.Join(cloning, " && "))
-
+func deploy(cmds []string) {
 	fmt.Println()
-	for _, c := range d.Commands {
+	for _, c := range cmds {
 		sh(c)
 	}
 }
