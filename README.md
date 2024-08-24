@@ -3,7 +3,7 @@
 To install the `watch` tool, run this script:
 
 ```sh
-git clone https://github.com/restartfu/watch
+git clone --depth=1 https://github.com/restartfu/watch
 cd watch
 go build -o watch .
 sudo chmod +x watch
