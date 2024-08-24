@@ -6,8 +6,8 @@ To install the `watch` tool, run this script:
 git clone https://github.com/restartfu/watch
 cd watch
 go build -o watch .
-chmod +x watch
-mv watch /usr/bin/watch
+sudo chmod +x watch
+sudo mv watch /usr/bin/watch
 ```
 
 Now, you can run the `watch` command from anywhere in your terminal.
